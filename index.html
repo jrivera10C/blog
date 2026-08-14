@@ -1,109 +1,349 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistema Administrativo - Clientes</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link rel="stylesheet" href="css/estilos.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apoyo</title>
+    <!-- Fuente Corporativa de Alta Gama -->
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- ESTILOS ULTRA-PREMIUM (CSS) --- */
+        :root {
+            --bg-main: #060913;
+            --bg-card: rgba(18, 24, 38, 0.6);
+            --bg-hover: rgba(30, 41, 59, 0.7);
+            --text-main: #F3F4F6;
+            --text-muted: #9CA3AF;
+            --accent: #00F5D4; /* Cian Tecnológico */
+            --accent-glow: rgba(0, 245, 212, 0.15);
+            --border: rgba(255, 255, 255, 0.06);
+            --radius: 20px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 80px 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Iluminación ambiental de fondo (Glows) */
+        body::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(0, 245, 212, 0.07) 0%, transparent 75%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .app-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .logo {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--accent);
+            margin-bottom: 16px;
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        header h1 {
+            font-size: 42px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 12px;
+            background: linear-gradient(180deg, #FFFFFF 0%, #A3A3A3 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+
+        /* Buscador Avanzado */
+        .search-container {
+            max-width: 540px;
+            margin: 0 auto 50px auto;
+            position: relative;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 16px 24px;
+            background-color: rgba(18, 24, 38, 0.8);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 15px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .search-container input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 25px rgba(0, 245, 212, 0.1), inset 0 0 0 1px rgba(0, 245, 212, 0.2);
+            background-color: #121826;
+        }
+
+        /* Grid Adaptativo */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 28px;
+        }
+
+        /* Tarjeta de Vidrio Esmerilado (Glassmorphism) */
+        .file-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .file-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(0, 245, 212, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 245, 212, 0.05);
+            background-color: var(--bg-hover);
+        }
+
+        .file-icon {
+            font-size: 36px;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .file-info h3 {
+            font-size: 19px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: -0.3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-meta {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 26px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .badge {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 11px;
+            color: #E5E7EB;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        /* Botón de Acción Líquido */
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 14px;
+            background-color: var(--text-main);
+            color: var(--bg-main);
+            font-weight: 700;
+            font-size: 14px;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .file-card:hover .download-btn {
+            background-color: var(--accent);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .download-btn:active {
+            transform: scale(0.97);
+        }
+    </style>
 </head>
 <body>
-<aside class="sidebar" id="sidebar">
-  <div class="brand">
-    <div class="brand-icon"><i class="bi bi-grid-1x2-fill"></i></div>
-    <div><strong>AdminPro</strong><small>Sistema Administrativo</small></div>
-  </div>
-  <div class="section-title">PRINCIPAL</div>
-  <nav class="nav flex-column">
-    <a class="nav-link" href="#"><i class="bi bi-speedometer2"></i><span>Dashboard</span></a>
-    <a class="nav-link active" href="#"><i class="bi bi-people-fill"></i><span>Clientes</span></a>
-    <a class="nav-link" href="#"><i class="bi bi-cash-stack"></i><span>Préstamos</span></a>
-    <a class="nav-link" href="#"><i class="bi bi-bar-chart-fill"></i><span>Reportes</span></a>
-  </nav>
-  <div class="section-title mt-4">CONFIGURACIÓN</div>
-  <nav class="nav flex-column">
-    <a class="nav-link" href="#"><i class="bi bi-gear-fill"></i><span>Configuración</span></a>
-    <a class="nav-link text-danger" href="#"><i class="bi bi-box-arrow-right"></i><span>Cerrar sesión</span></a>
-  </nav>
-</aside>
 
-<main class="main-content">
-  <header class="topbar">
-    <button class="btn btn-light d-lg-none" id="btnMenu"><i class="bi bi-list fs-4"></i></button>
-    <div class="ms-auto d-flex align-items-center gap-3">
-      <button class="icon-btn position-relative"><i class="bi bi-bell"></i><span class="notification">3</span></button>
-      <div class="dropdown">
-        <button class="user-btn dropdown-toggle" data-bs-toggle="dropdown">
-          <span class="avatar">JD</span><span class="d-none d-md-inline">José David</span>
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-          <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Mi perfil</a></li>
-          <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Configuración</a></li>
-          <li><hr class="dropdown-divider"></li>
-          <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión</a></li>
-        </ul>
-      </div>
-    </div>
-  </header>
+    <div class="app-container">
+        <header>
+            <div class="logo">Documentacion Proyectos</div>
+            <h1>Centro de Descargas</h1>
+            <p class="subtitle">Gestiona y descarga la guia o proyecto que necesites</p>
+        </header>
 
-  <div class="container-fluid p-4">
-    <div class="page-title d-flex justify-content-between align-items-center mb-4">
-      <div>
-        <h2>Clientes</h2>
-        <p>Administración de clientes registrados</p>
-      </div>
-      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#clienteModal">
-        <i class="bi bi-plus-lg me-1"></i> Nuevo cliente
-      </button>
-    </div>
-
-    <div class="row g-3 mb-4">
-      <div class="col-md-4"><div class="stat-card"><div><small>Total clientes</small><h3>128</h3></div><div class="stat-icon"><i class="bi bi-people-fill"></i></div></div></div>
-      <div class="col-md-4"><div class="stat-card"><div><small>Clientes activos</small><h3>114</h3></div><div class="stat-icon success"><i class="bi bi-person-check-fill"></i></div></div></div>
-      <div class="col-md-4"><div class="stat-card"><div><small>Clientes inactivos</small><h3>14</h3></div><div class="stat-icon warning"><i class="bi bi-person-x-fill"></i></div></div></div>
-    </div>
-
-    <div class="card border-0 shadow-sm">
-      <div class="card-body p-0">
-        <div class="table-toolbar p-3">
-          <div class="input-group search-box">
-            <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-            <input id="buscar" type="text" class="form-control" placeholder="Buscar cliente...">
-          </div>
-          <button class="btn btn-outline-secondary"><i class="bi bi-funnel me-1"></i> Filtrar</button>
+        <div class="search-container">
+            <input type="text" id="search-bar" placeholder="Buscar por nombre de archivo o formato..." oninput="searchFiles()">
         </div>
-        <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead><tr><th>ID</th><th>Cliente</th><th>Documento</th><th>Teléfono</th><th>Estado</th><th>Registro</th><th class="text-end">Acciones</th></tr></thead>
-            <tbody id="tablaClientes"></tbody>
-          </table>
-        </div>
-        <div class="p-3 d-flex justify-content-between align-items-center border-top">
-          <small class="text-muted">Mostrando 8 clientes de 128</small>
-          <nav><ul class="pagination pagination-sm mb-0"><li class="page-item disabled"><a class="page-link">Anterior</a></li><li class="page-item active"><a class="page-link">1</a></li><li class="page-item"><a class="page-link">2</a></li><li class="page-item"><a class="page-link">3</a></li><li class="page-item"><a class="page-link">Siguiente</a></li></ul></nav>
-        </div>
-      </div>
-    </div>
-  </div>
-</main>
 
-<div class="modal fade" id="clienteModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border-0 shadow">
-      <div class="modal-header"><h5 class="modal-title"><i class="bi bi-person-plus me-2"></i>Nuevo cliente</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-      <div class="modal-body">
-        <div class="mb-3"><label class="form-label">Nombre completo</label><input id="nombre" class="form-control" placeholder="Ej. Juan Pérez"></div>
-        <div class="row g-3"><div class="col-md-6"><label class="form-label">Documento</label><input id="documento" class="form-control" placeholder="00000000-0"></div><div class="col-md-6"><label class="form-label">Teléfono</label><input id="telefono" class="form-control" placeholder="7000-0000"></div></div>
-        <div class="mb-3 mt-3"><label class="form-label">Estado</label><select id="estado" class="form-select"><option>Activo</option><option>Inactivo</option></select></div>
-      </div>
-      <div class="modal-footer"><button class="btn btn-light" data-bs-dismiss="modal">Cancelar</button><button class="btn btn-primary" id="guardar">Guardar cliente</button></div>
+        <main id="files-wrapper" class="grid-container">
+            <!-- Las tarjetas se generan dinámicamente mediante JS -->
+        </main>
     </div>
-  </div>
-</div>
 
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="js/app.js"></script>
+    <script>
+        /* --- LÓGICA DE INTERACCIÓN (JAVASCRIPT) --- */
+        
+        // RECUERDA: Coloca tus archivos reales dentro de una carpeta llamada "archivos"
+        const database = [
+            {
+                name: "Mostrar Api",
+                size: "65.4 KB",
+                type: "Imagen",
+                icon: "🖼️",
+                path: "archivos/MostrarApi.PNG"
+            },
+            {
+                name: "Post Api",
+                size: "65.4 KB",
+                type: "Imagen",
+                icon: "🖼️",
+                path: "archivos/postApi.PNG"
+            },
+            {
+                name: "Consumir Api",
+                size: "75.3 KB",
+                type: "Imagen",
+                icon: "🖼️",
+                path: "archivos/ConsumirApi.PNG"
+            },
+            {
+                name: "HabilitarCors.pdf",
+                size: "12 KB",
+                type: "PDF",
+                icon: "🗎",
+                path: "archivos/HabilitarCors.pdf"
+            },
+			
+			
+            {
+                name: "Modelo MVC",
+                size: "12 KB",
+                type: "PDF",
+                icon: "🗎",
+                path: "archivos/Mvc.pdf"
+            },
+			
+			
+			 {
+                name: "Api usando Cors",
+                size: "12 KB",
+                type: "PDF",
+                icon: "🗎",
+                path: "archivos/AnotacionesEntrevista.pdf"
+            },
+			
+			
+			
+			 {
+                name: "Sistema Completo Api",
+                size: "27.3 MB",
+                type: "ZIP",
+                icon: "📦",
+                path: "archivos/SistemaCompleto.zip"
+            },
+			
+			
+			{
+                name: "	Seguridad JWT Api",
+                size: "27.3 MB",
+                type: "PDF",
+                icon: "📦",
+                path: "archivos/APIsBearer.pdf"
+            },
+			
+			{
+                name: "	Push Notification Api",
+                size: "27.3 MB",
+                type: "ZIP",
+                icon: "📦",
+                path: "archivos/PushNotificationApi.zip"
+            },
+        ];
+
+        const wrapper = document.getElementById('files-wrapper');
+
+        function render(items) {
+            wrapper.innerHTML = "";
+            
+            if(items.length === 0) {
+                wrapper.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-size: 15px; margin-top: 20px;">No se encontraron elementos que coincidan con la búsqueda.</p>`;
+                return;
+            }
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "file-card";
+                card.innerHTML = `
+                    <div class="file-info">
+                        <div class="file-icon">${item.icon}</div>
+                        <h3 title="${item.name}">${item.name}</h3>
+                        <div class="file-meta">
+                            <span class="badge">${item.type}</span>
+                            <span>•</span>
+                            <span>${item.size}</span>
+                        </div>
+                    </div>
+                    <a href="${item.path}" download="${item.name}" class="download-btn">
+                        Descargar Recurso
+                    </a>
+                `;
+                wrapper.appendChild(card);
+            });
+        }
+
+        function searchFiles() {
+            const query = document.getElementById('search-bar').value.toLowerCase();
+            const filtered = database.filter(item => 
+                item.name.toLowerCase().includes(query) || 
+                item.type.toLowerCase().includes(query)
+            );
+            render(filtered);
+        }
+
+        // Carga inicial al abrir el navegador
+        render(database);
+    </script>
 </body>
 </html>
