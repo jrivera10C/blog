@@ -1,0 +1,375 @@
+Install-Package Microsoft.Data.SqlClient
+
+using Microsoft.Data.SqlClient;
+
+"ConnectionStrings": {
+  "DefaultConnection": "Server=localhost;Database=MiBase;Trusted_Connection=True;TrustServerCertificate=True;"
+}
+**********************************procedure*************************************************
+
+
+CREATE PROCEDURE sp_ValidarUsuario
+    @usuario VARCHAR(100),
+    @PasswordHash VARCHAR(255) -- La contraseña ya debe venir cifrada desde la app
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF EXISTS (SELECT 1 FROM usuexterno WHERE usuario = @usuario AND     CONVERT(VARCHAR(300), DECRYPTBYPASSPHRASE('INFOSRC2-JVDL', contrasena)) = @PasswordHash AND ideestado = 1)
+    BEGIN
+    select * from usuexterno where usuario=@usuario
+    END
+    ELSE
+    BEGIN
+        RAISERROR('Credenciales inválidas o usuario inactivo.', 16, 1);
+    END
+END
+
+
+***********************************************************************************************
+
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using System.Data;
+using UsuarioApi.modelos;
+
+
+
+// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+
+namespace UsuarioApi.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class UsuarioController : ControllerBase
+    {
+        private readonly string _connectionString;
+
+        public UsuarioController(IConfiguration configuration)
+        {
+
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
+                }
+
+            [HttpPost]
+
+
+        public IActionResult ValidarUsuario([FromBody] UsuarioRequest usu)
+        {
+            bool usuarioExiste = false;
+            string nombreUsuario = string.Empty;
+
+            if (usu == null || string.IsNullOrEmpty(usu.Usuario) || string.IsNullOrEmpty(usu.Contraseña))
+            {
+                return BadRequest("Datos Invalidos");
+            }
+
+            try
+            {
+                // El 'using' asegura que la conexión se cierre sola al llegar al final del método
+                using SqlConnection con = new SqlConnection(_connectionString);
+                using SqlCommand cmd = new SqlCommand("sp_ValidarUsuario", con);
+
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@usuario", usu.Usuario);
+                cmd.Parameters.AddWithValue("@PasswordHash", usu.Contraseña);
+
+                con.Open();
+
+                // El 'using' aquí asegura que el lector de datos se cierre inmediatamente después de usarse
+                using SqlDataReader reader = cmd.ExecuteReader();
+
+                if (reader.Read()) // Si el procedimiento devuelve al menos una fila, las credenciales son correctas
+                {
+                    usuarioExiste = true;
+                    // Se lee la columna "usuario" que devuelve tu SP
+                    nombreUsuario = reader["usuario"].ToString();
+                }
+
+                if (usuarioExiste)
+                {
+                    // Modificado para devolver 'nombreUsuario' (el que vino de la BD) en lugar de 'usu.Usuario'
+                    return Ok(new { Mensaje = "Acceso concedido", Usuario = nombreUsuario });
+                }
+                else
+                {
+                    return Unauthorized("Usuario o contraseña incorrectos.");
+                }
+            }
+            catch (Exception ex)
+            {
+                // En caso de que falle la conexión a la base de datos o el SP tenga un error
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
+            }
+        }
+
+
+
+    }
+    }
+
+***********************************************   INDEX   *********************************************
+
+@page
+@model IndexModel
+@{
+    Layout = null;
+}
+
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #fff 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            color: #666;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+            input:focus {
+                outline: none;
+                border-color: #667eea;
+            }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+
+            button:hover {
+                background: #5a6fd6;
+            }
+
+        .error-msg {
+            color: #e53e3e;
+            font-size: 14px;
+            margin-top: 12px;
+            display: none;
+            padding: 10px;
+            background: #fff5f5;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <h2>Bienvenido</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="usuario">Matrícula / Usuario</label>
+                <input type="text" id="usuario" placeholder="Ingresa tu usuario" required>
+            </div>
+            <div class="form-group">
+                <label for="contrasena">Contraseña</label>
+                <input type="password" id="contrasena" placeholder="••••••••" required>
+            </div>
+            <button type="submit">Ingresar</button>
+            <div id="error" class="error-msg"></div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const usuario = document.getElementById('usuario').value;
+            const contrasena = document.getElementById('contrasena').value;
+            const errorDiv = document.getElementById('error');
+
+            errorDiv.style.display = 'none';
+
+            try {
+                // Reemplaza con la URL exacta de tu API de ASP.NET Core
+                const respuesta = await fetch('https://localhost:7180/api/usuario', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ Usuario: usuario, Contraseña: contrasena })
+                });
+
+                if (respuesta.ok) {
+                    const resultado = await respuesta.json();
+
+                    // Guardamos el nombre retornado por la base de datos temporalmente
+                    localStorage.setItem('usuarioLogueado', resultado.usuario);
+
+                    // Redirección inmediata a la otra página
+                    window.location.href = 'dashboard';
+                } else {
+                    const textoError = await respuesta.text();
+                    errorDiv.innerText = textoError || "Credenciales incorrectas.";
+                    errorDiv.style.display = 'block';
+                }
+            } catch (err) {
+                errorDiv.innerText = "No se pudo conectar con el servidor.";
+                errorDiv.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+*************************************** dashboard  ************************************************
+
+@page
+@model IndexModel
+@{
+    Layout = null;
+}
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background-color: #f7fafc;
+            color: #2d3748;
+        }
+
+        nav {
+            background: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+        }
+
+        .logo {
+            font-weight: bold;
+            font-size: 20px;
+            color: #667eea;
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            background: #e53e3e;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .welcome-card {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            color: #1a202c;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">Mi Sistema</div>
+        <button class="logout-btn" onclick="cerrarSesion()">Cerrar Sesión</button>
+    </nav>
+
+    <div class="container">
+        <div class="welcome-card">
+            <h1>¡Hola, <span id="nombreUsuario">Usuario</span>!</h1>
+            <p>Has ingresado correctamente al sistema utilizando validación por Procedimiento Almacenado.</p>
+        </div>
+    </div>
+
+    <script>
+        // Seguridad Básica: Si no hay usuario en el almacenamiento, redirigir al login
+        const usuario = localStorage.getItem('usuarioLogueado');
+        if (!usuario) {
+        window.location.href = '/';
+        } else {
+            document.getElementById('nombreUsuario').innerText = usuario;
+        }
+
+        function cerrarSesion() {
+            localStorage.removeItem('usuarioLogueado');
+        window.location.href = '/';
+        }
+    </script>
+</body>
+</html>
