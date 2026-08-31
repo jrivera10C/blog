@@ -1,0 +1,185 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http;
+using System.Configuration;
+using WebApplication1.Models;
+using System.Data;
+using System.Data.SqlClient;
+using System.Web.Http.Cors;
+
+namespace WebApplication1.Controllers
+{
+    [Authorize]
+
+    [EnableCors(origins: "*", headers: "*", methods: "*")] 
+    public class ValuesController : ApiController
+    {
+    //<connectionStrings>
+    //<add name="Conexion" connectionString="Data Source=10.0.0.15;Initial Catalog=dw_srcsdb; User Id=accesoinfo2; Password=67Mustang;  TrustServerCertificate=True" providerName="System.Data.SqlClient" />  
+        private readonly string Conexion = ConfigurationManager.ConnectionStrings["Conexion"].ToString();
+
+        // GET api/values
+        public IEnumerable<Estudiantes> Get()
+        {
+            var Lista = new List<Estudiantes>();
+
+
+            string query = "select id,matricula,nombres,apellidos,fecha_nacimiento,documento_identidad,correo_institucional,telefono,estado from Estudiantes";
+
+                
+            SqlConnection con=new SqlConnection(Conexion);
+            SqlCommand comando = new SqlCommand(query, con);
+
+            con.Open();
+
+            using (SqlDataReader reader = comando.ExecuteReader())
+            {
+                while(reader.Read())
+                {
+
+                    Lista.Add(new Estudiantes
+                    {
+
+
+
+                        Id = (int)reader["id"],
+                        Matricula = reader["matricula"].ToString(),
+                        Nombres = reader["nombres"].ToString(),
+                        Apellidos = reader["apellidos"].ToString(),
+                        FechaNacimiento = (DateTime)reader["fecha_nacimiento"],
+                        DocumentoIdentidad = reader["documento_identidad"].ToString(),
+                        CorreoInstitucional = reader["correo_institucional"].ToString(),
+                        Telefono = reader["telefono"].ToString(),
+                        Estado = reader["estado"].ToString()
+
+                    });
+
+                }
+
+            }
+                
+            con.Close();
+            con.Dispose();
+
+
+
+            return Lista;
+        }
+
+        // GET api/estudiantes/5 (Obtener por ID)
+        public IHttpActionResult Get(int id)
+        {
+            using (SqlConnection conn = new SqlConnection(Conexion))
+            {
+                string query = "SELECT id, matricula, nombres, apellidos, fecha_nacimiento, documento_identidad, correo_institucional, telefono, estado FROM Estudiantes WHERE id = @id";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", id);
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            var estudiante = new Estudiantes
+                            {
+                                Id = (int)reader["id"],
+                                Matricula = reader["matricula"].ToString(),
+                                Nombres = reader["nombres"].ToString(),
+                                Apellidos = reader["apellidos"].ToString(),
+                                FechaNacimiento = (DateTime)reader["fecha_nacimiento"],
+                                DocumentoIdentidad = reader["documento_identidad"].ToString(),
+                                CorreoInstitucional = reader["correo_institucional"].ToString(),
+                                Telefono = reader["telefono"].ToString(),
+                                Estado = reader["estado"].ToString()
+                            };
+                            return Ok(estudiante);
+                        }
+                    }
+                }
+            }
+            return NotFound();
+        }
+
+        // POST api/values
+        public  IHttpActionResult  Post([FromBody]Estudiantes es)
+        {
+           if (es==null)
+           {
+
+               return BadRequest("Datos Invalidos");
+           }
+
+
+           SqlConnection con = new SqlConnection(Conexion);
+           SqlCommand cmd = new SqlCommand("sp_InsertarEstudiante", con);
+
+           cmd.CommandType = CommandType.StoredProcedure;
+
+           cmd.Parameters.AddWithValue("@matricula", es.Matricula);
+           cmd.Parameters.AddWithValue("@nombres", es.Nombres);
+           cmd.Parameters.AddWithValue("@apellidos", es.Apellidos);
+           cmd.Parameters.AddWithValue("@fecha_nacimiento", es.FechaNacimiento);
+           cmd.Parameters.AddWithValue("@documento_identidad", es.DocumentoIdentidad);
+           cmd.Parameters.AddWithValue("@correo_institucional", es.CorreoInstitucional);
+           cmd.Parameters.AddWithValue("@telefono", (object)es.Telefono ?? DBNull.Value);
+           con.Open();
+           cmd.ExecuteNonQuery();
+
+            return Ok("Estudiante ingresado corectamente");
+
+
+        }
+
+        public IHttpActionResult Put(int id, [FromBody] Estudiantes est)
+        {
+            if (est == null) return BadRequest();
+
+            using (SqlConnection conn = new SqlConnection(Conexion))
+            {
+                string query = @"UPDATE Estudiantes 
+                             SET matricula=@matricula, nombres=@nombres, apellidos=@apellidos, fecha_nacimiento=@fecha_nacimiento, 
+                                 documento_identidad=@documento_identidad, correo_institucional=@correo_institucional, telefono=@telefono, estado=@estado 
+                             WHERE id=@id";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", id);
+                    cmd.Parameters.AddWithValue("@matricula", est.Matricula);
+                    cmd.Parameters.AddWithValue("@nombres", est.Nombres);
+                    cmd.Parameters.AddWithValue("@apellidos", est.Apellidos);
+                    cmd.Parameters.AddWithValue("@fecha_nacimiento", est.FechaNacimiento);
+                    cmd.Parameters.AddWithValue("@documento_identidad", est.DocumentoIdentidad);
+                    cmd.Parameters.AddWithValue("@correo_institucional", est.CorreoInstitucional);
+                    cmd.Parameters.AddWithValue("@telefono", (object)est.Telefono ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@estado", est.Estado);
+
+                    conn.Open();
+                    int filasAfectadas = cmd.ExecuteNonQuery();
+                    if (filasAfectadas == 0) return NotFound();
+                }
+            }
+            return Ok("Estudiante actualizado.");
+        }
+
+        // DELETE api/estudiantes/5 (Eliminar)
+        public IHttpActionResult Delete(int id)
+        {
+            using (SqlConnection conn = new SqlConnection(Conexion))
+            {
+                string query = "DELETE FROM Estudiantes WHERE id = @id";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", id);
+                    conn.Open();
+                    int filasAfectadas = cmd.ExecuteNonQuery();
+                    if (filasAfectadas == 0) return NotFound();
+                }
+            }
+            return Ok("Estudiante eliminado.");
+        }
+    }
+}
+

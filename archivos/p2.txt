@@ -1,0 +1,276 @@
+@{
+    Layout = null;
+}
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Administrativo - Clientes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <link href="~/Content/estilos.css" rel="stylesheet" />
+
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="brand">
+            <div class="brand-icon"><i class="bi bi-grid-1x2-fill"></i></div>
+            <div><strong>AdminPro</strong><small>Sistema Administrativo</small></div>
+        </div>
+        <div class="section-title">PRINCIPAL</div>
+        <nav class="nav flex-column">
+            <a class="nav-link" href="#"><i class="bi bi-speedometer2"></i><span>Dashboard</span></a>
+            <a class="nav-link active" href="#"><i class="bi bi-people-fill"></i><span>Clientes</span></a>
+            <a class="nav-link" href="#"><i class="bi bi-cash-stack"></i><span>Préstamos</span></a>
+            <a class="nav-link" href="#"><i class="bi bi-bar-chart-fill"></i><span>Reportes</span></a>
+        </nav>
+        <div class="section-title mt-4">CONFIGURACIÓN</div>
+        <nav class="nav flex-column">
+            <a class="nav-link" href="#"><i class="bi bi-gear-fill"></i><span>Configuración</span></a>
+            <a class="nav-link text-danger" href="#"><i class="bi bi-box-arrow-right"></i><span>Cerrar sesión</span></a>
+        </nav>
+    </aside>
+    <main class="main-content">
+        <header class="topbar">
+            <button class="btn btn-light d-lg-none" id="btnMenu"><i class="bi bi-list fs-4"></i></button>
+            <div class="ms-auto d-flex align-items-center gap-3">
+                <button class="icon-btn position-relative"><i class="bi bi-bell"></i><span class="notification">3</span></button>
+                <div class="dropdown">
+                    <button class="user-btn dropdown-toggle" data-bs-toggle="dropdown">
+                        <span class="avatar">JD</span><span class="d-none d-md-inline">José David</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Mi perfil</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Configuración</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión</a></li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+        <div class="container-fluid p-4">
+            <div class="page-title d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2>Clientes</h2>
+                    <p>Administración de clientes registrados</p>
+                </div>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#clienteModal">
+                    <i class="bi bi-plus-lg me-1"></i> Nuevo cliente
+                </button>
+            </div>
+            <div class="row g-3 mb-4">
+                <div class="col-md-4"><div class="stat-card"><div><small>Total clientes</small><h3>128</h3></div><div class="stat-icon"><i class="bi bi-people-fill"></i></div></div></div>
+                <div class="col-md-4"><div class="stat-card"><div><small>Clientes activos</small><h3>114</h3></div><div class="stat-icon success"><i class="bi bi-person-check-fill"></i></div></div></div>
+                <div class="col-md-4"><div class="stat-card"><div><small>Clientes inactivos</small><h3>14</h3></div><div class="stat-icon warning"><i class="bi bi-person-x-fill"></i></div></div></div>
+            </div>
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-toolbar p-3">
+                       
+                    </div>
+                    
+
+                    <table id="tablaEstudiantes" class="table table-striped table-bordered w-100">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Matrícula</th>
+                                <th>Nombres</th>
+                                <th>Apellidos</th>
+                                <th>Documento</th>
+                                <th>Correo Electrónico</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- DataTables inyectará las filas de la base de datos automáticamente aquí -->
+                        </tbody>
+                    </table>
+
+
+
+                  
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- Modal para registrar Nuevo Estudiante -->
+    <div class="modal fade" id="clienteModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <!-- modal-lg da más espacio para los campos -->
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="bi bi-person-plus me-2"></i>Nuevo Estudiante</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <!-- Fila 1: Matrícula y Documento -->
+                        <div class="col-md-6">
+                            <label class="form-label">Matrícula</label>
+                            <input id="txtMatricula" class="form-control" placeholder="Ej. EST-2026-009">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Documento de Identidad</label>
+                            <input id="txtDocumento" class="form-control" placeholder="Ej. DNI-77889900">
+                        </div>
+
+                        <!-- Fila 2: Nombres y Apellidos -->
+                        <div class="col-md-6">
+                            <label class="form-label">Nombres</label>
+                            <input id="txtNombres" class="form-control" placeholder="Ej. Juan Carlos">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Apellidos</label>
+                            <input id="txtApellidos" class="form-control" placeholder="Ej. Pérez Gómez">
+                        </div>
+                        <!-- Fila 3: Fecha de Nacimiento y Teléfono -->
+                        <div class="col-md-6">
+                            <label class="form-label">Fecha de Nacimiento</label>
+                            <input id="txtFechaNacimiento" type="date" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Teléfono</label>
+                            <input id="txtTelefono" class="form-control" placeholder="Ej. +519876543">
+                        </div>
+                        <!-- Fila 4: Correo Institucional -->
+                        <div class="col-md-12">
+                            <label class="form-label">Correo Institucional</label>
+                            <input id="txtCorreo" type="email" class="form-control" placeholder="Ej. juan.perez@universidad.edu">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-primary" id="btnGuardar" onclick="NuevoEstudiante();">Guardar Estudiante</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.datatables.net/v/dt/dt-3.0.1/datatables.min.css" rel="stylesheet">
+    <script src="https://cdn.datatables.net/v/dt/dt-3.0.1/datatables.min.js"></script>
+    @*<script src="~/Scripts/app.js"></script>*@
+    <script>
+    $(document).ready(function () {
+
+
+        cargarEstudiantes();
+    });
+
+
+    function cargarEstudiantes ()
+    {
+        $('#tablaEstudiantes').DataTable({
+            "ajax": {
+                "url": "http://localhost:46533/api/values",
+                "type": "GET",
+                // 🚨 CAMBIAMOS ESTA LÍNEA POR UNA FUNCIÓN DE DIAGNÓSTICO
+                "dataSrc": function (json) {
+                    // 🔍 ESTO IMPRIMIRÁ EN TU CONSOLA LO QUE LLEGA REALMENTE DE LA API
+                    console.log("=== DATOS RECIBIDOS DESDE LA API ===");
+                    console.log(json);
+
+                    // Retornamos el JSON para que DataTables lo procese normalmente
+                    return json;
+                }
+            },
+            "columns": [
+                { "data": "Id" },
+                { "data": "Matricula" },
+                { "data": "Nombres" },
+                { "data": "Apellidos" },
+                { "data": "DocumentoIdentidad" },
+                { "data": "CorreoInstitucional" },
+                {
+                    "data": "Estado",
+                    "render": function (data) {
+                        if (data === "Activo") return '<span class="badge bg-success">Activo</span>';
+                        if (data === "Inactivo") return '<span class="badge bg-danger">Inactivo</span>';
+                        if (data === "Suspendido") return '<span class="badge bg-warning text-dark">Suspendido</span>';
+                        return '<span class="badge bg-secondary">' + data + '</span>';
+                    }
+                }
+            ],
+
+            // 🚨 AQUÍ TRADUCIMOS TODO DE FORMA LOCAL E INFALIBLE
+            "language": {
+                "processing": "Procesando...",
+                "lengthMenu": "Mostrar _MENU_ registros",
+                "zeroRecords": "No se encontraron resultados",
+                "emptyTable": "Ningún dato disponible en esta tabla",
+                "search": "Buscar:",
+                "loadingRecords": "Cargando..."
+            }
+        });
+                }
+
+
+
+        function NuevoEstudiante() {
+
+            var estudianteData = {
+                Matricula: $("#txtMatricula").val().trim(),
+                Nombres: $("#txtNombres").val().trim(),
+                Apellidos: $("#txtApellidos").val().trim(),
+                FechaNacimiento: $("#txtFechaNacimiento").val(),
+                DocumentoIdentidad: $("#txtDocumento").val().trim(),
+                CorreoInstitucional: $("#txtCorreo").val().trim(),
+                Telefono: $("#txtTelefono").val().trim() || null // Si está vacío, envía null
+            };
+
+            // 2. Validación básica de campos obligatorios
+            if (!estudianteData.Matricula || !estudianteData.Nombres || !estudianteData.Apellidos || !estudianteData.FechaNacimiento || !estudianteData.DocumentoIdentidad || !estudianteData.CorreoInstitucional) {
+                alert("Por favor, complete todos los campos obligatorios del formulario.");
+                return;
+            }
+
+            // 3. Deshabilitar el botón temporalmente para evitar doble clic erróneo
+            $("#btnGuardar").prop("disabled", true).text("Guardando...");
+
+            // 4. Petición AJAX POST hacia tu API de .NET
+            $.ajax({
+                url: "http://localhost:46533/api/values", // Asegúrate de usar el puerto correcto
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: JSON.stringify(estudianteData), // Convierte el objeto JS a texto JSON string
+                success: function (response) {
+                    alert("¡Éxito! El estudiante ha sido registrado correctamente.");
+
+                    // Cerrar la ventana modal de forma limpia usando Bootstrap 5
+                    var modalElement = document.getElementById('clienteModal');
+                    var modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
+
+                    // Limpiar el formulario para un próximo registro
+                    $("#txtMatricula, #txtNombres, #txtApellidos, #txtFechaNacimiento, #txtDocumento, #txtCorreo, #txtTelefono").val("");
+
+                    // 🔄 REFRESCAR LA DATATABLE AUTOMÁTICAMENTE
+                    // Si tu tabla de estudiantes se llama 'tablaEstudiantes', esto recarga los datos sin parpadear la pantalla
+                    if ($.fn.DataTable.isDataTable('#tablaEstudiantes')) {
+                        $('#tablaEstudiantes').DataTable().ajax.reload();
+                    }
+                },
+                error: function (xhr, status, error) {
+                    // Si el backend responde con un BadRequest() u otro error de validación
+                    var mensajeError = xhr.responseJSON ? xhr.responseJSON.Message : "No se pudo conectar con el servidor.";
+                    alert("Error al guardar: " + mensajeError);
+                },
+                complete: function () {
+                    // Al finalizar (con éxito o error), volvemos a activar el botón de guardado
+                    $("#btnGuardar").prop("disabled", false).text("Guardar Estudiante");
+                }
+            });
+    
+        }
+    </script>
+        </body>
+</html>
