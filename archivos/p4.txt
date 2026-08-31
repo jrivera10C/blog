@@ -25,6 +25,26 @@ BEGIN
     END
 END
 
+**************************HABILITAR COROS-------------------
+
+Debes habilitar los accesos en tu archivo Program.cs de tu API añadiendo esto antes de builder.Build():
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("PermitirTodo", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
+
+Y justo antes de app.UseAuthorization(); agrega:
+
+
+app.UseCors("PermitirTodo");
+
 
 ***********************************************************************************************
 
