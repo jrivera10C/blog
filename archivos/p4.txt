@@ -15,9 +15,9 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    IF EXISTS (SELECT 1 FROM usuexterno WHERE usuario = @usuario AND     CONVERT(VARCHAR(300), DECRYPTBYPASSPHRASE('INFOSRC2-JVDL', contrasena)) = @PasswordHash AND ideestado = 1)
+    IF EXISTS (SELECT 1 FROM usuario WHERE usuario = @usuario AND     CONVERT(VARCHAR(300), DECRYPTBYPASSPHRASE('mipass', contrasena)) = @PasswordHash AND ideestado = 1)
     BEGIN
-    select * from usuexterno where usuario=@usuario
+    select * from usuario where usuario=@usuario
     END
     ELSE
     BEGIN
